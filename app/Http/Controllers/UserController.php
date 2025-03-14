@@ -10,7 +10,7 @@ class UserController extends Controller
 {
     public function index()
     {
-        $user = UserModel::firstOrNew(
+        $user = UserModel::firstOrCreate(
             [
                 'username' => 'manager33',
                 'nama' => 'Manager Tiga Tiga',
