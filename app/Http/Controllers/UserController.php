@@ -55,8 +55,13 @@ class UserController extends Controller
         return redirect('/user');      // Redirect kembali ke halaman daftar user
     }
 
+    //public function index() {
+      //  $user = UserModel::with('level')->get();
+        //dd($user);
+    //}
+
     public function index() {
         $user = UserModel::with('level')->get();
-        dd($user);
+        return view('user', ['data' => $user]);
     }
 }
