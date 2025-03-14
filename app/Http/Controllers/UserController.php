@@ -47,4 +47,11 @@ class UserController extends Controller
     
         return redirect('/user');
     }
+
+    public function hapus($id) {
+        $user = UserModel::find($id);  // Mencari user berdasarkan ID
+        $user->delete();               // Menghapus user dari database
+    
+        return redirect('/user');      // Redirect kembali ke halaman daftar user
+    }
 }
