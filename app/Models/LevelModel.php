@@ -9,10 +9,10 @@ class LevelModel extends Model
 {
     protected $table = 'm_level';
     protected $primaryKey = 'level_id';
-    protected $fillable = ['level_kode', 'level_name']; //Foreign key
+    public $timestamps = false;// Jika tabel tidak memiliki created_at dan updated_at
 
-    public function users(): HasMany
-    {
-        return $this->hasMany(UserModel::class, 'level_id', 'level_id');
-    }
+    protected $fillable = [
+        'level_kode',
+        'level_nama'
+    ];
 }
