@@ -21,6 +21,8 @@ Route::group(['prefix' => 'user'], function () {
     Route::delete('/{id}', [UserController::class, 'destroy']); // menghapus data user
 });
 
+Route::get('/', [WelcomeController::class,'index']);
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -47,6 +49,5 @@ Route::get('/user/ubah/{id}', [UserController::class, 'ubah']);
 Route::put('/user/ubah_simpan/{id}', [UserController::class, 'ubah_simpan']);
 Route::get('/user/hapus/{id}', [UserController::class, 'hapus']);
 
-Route::get('/', [WelcomeController::class,'index']);
 */
 
