@@ -43,8 +43,8 @@
         </div>
     </div>
     <!-- Modal -->
-    <div id="myModal" class="modal fade animate shake" tabindex="-1" role="dialog" data-
-        backdrop="static" data-keyboard="false" data-width="75%" aria-hidden="true"></div>
+    <div id="myModal" class="modal fade animate shake" tabindex="-1" role="dialog" 
+        data-backdrop="static" data-keyboard="false" data-width="75%" aria-hidden="true"></div>
 @endsection
 
 @push('css')
@@ -58,8 +58,9 @@
             });
         }
 
-        $(document).ready(function () {
-            var dataUser = $('#table_user').DataTable({
+        var dataUser;
+        $(document).ready(function() {
+            dataUser = $('#table_user').DataTable({
                 serverSide: true,
                 ajax: {
                     url: "{{ url('user/list') }}",
