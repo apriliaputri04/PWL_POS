@@ -26,6 +26,7 @@
                         @endforeach
                     </select>
                     <small class="form-text text-muted">Level Pengguna</small>
+                    <button onclick="modalAction('{{ url('/user/create_ajax') }}')" class="btn btn-sm btn-success mt-2">Tambah Ajax</button>
                 </div>
             </div>
             <table class="table table-bordered table-striped table-hover table-sm" id="table_user">
