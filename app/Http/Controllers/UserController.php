@@ -180,4 +180,12 @@ public function list(Request $request)
             return redirect('/user')->with('error', 'Data user gagal dihapus karena masih terdapat tabel lain yang terkait dengan data ini');
         }
     }
+
+    public function create_ajax() 
+    {
+        $level = LevelModel::select('level_id', 'level_nama')-> get();
+        return view('user.create_ajax')
+                    ->with('level', $level);
+
+    }
 }
