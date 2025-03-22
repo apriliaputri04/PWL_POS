@@ -31,34 +31,34 @@ class UserController extends Controller
             'level' => $level, 
             'activeMenu' => $activeMenu
         ]);
-}
+    }
 
     // Ambil data user dalam bentuk JSON untuk DataTables
-public function list(Request $request)
-{
-    $users = UserModel::select('user_id', 'username', 'nama', 'level_id')
-        ->with('level');
+        public function list(Request $request)
+    {
+        $users = UserModel::select('user_id', 'username', 'nama', 'level_id')
+            ->with('level');
 
-    // filter data user berdasarkan level_id
-    if ($request->level_id) {
-        $users->where('level_id', $request->level_id);
-    }   
+        // Filter data user berdasarkan level_id
+        if ($request->level_id) {
+            $users->where('level_id', $request->level_id);
+        }
 
-    return DataTables::of($users)
-        // Menambahkan kolom index / nomor urut
-        ->addIndexColumn()
-        ->addColumn('aksi', function ($user) { // Menambahkan kolom aksi
-            $btn = '<a href="' . url('/user/' . $user->user_id) . '" class="btn btn-info btn-sm">Detail</a>';
-            $btn .= '<a href="' . url('/user/' . $user->user_id . '/edit') . '" class="btn btn-warning btn-sm">Edit</a>';
-            $btn .= '<form class="d-inline-block" method="POST" action="' . url('/user/' . $user->user_id) . '">' .
-                csrf_field() . method_field('DELETE') .
-                '<button type="submit" class="btn btn-danger btn-sm" onclick="return confirm(\'Apakah Anda yakin?\')">Hapus</button>' .
-                '</form>';
-
-            return $btn;
-        })
-        ->rawColumns(['aksi']) // Memastikan kolom "aksi" ditampilkan sebagai HTML
-        ->make(true);
+        return DataTables::of($users)
+            ->addIndexColumn() // Menambahkan kolom index / no urut (default nama kolom: DT_RowIndex)
+            ->addColumn('aksi', function ($user) {
+                $btn = '<button onclick="modalAction(\''.url('/user/' . $user->user_id . '/show_ajax').'\')" class="btn btn-info btn-sm">Detail</button> ';
+                $btn .= '<button onclick="modalAction(\''.url('/user/' . $user->user_id . '/edit_ajax').'\')" class="btn btn-warning btn-sm">Edit</button> ';
+                $btn .= '<button onclick="modalAction(\''.url('/user/' . $user->user_id . '/delete_ajax').'\')" class="btn btn-danger btn-sm">Hapus</button> ';
+                return $btn;
+                /* $btn = '<a href="'.url('/user/'. $user->user_id).'" class="btn btn-info btn-sm">Detail</a>';
+                $btn .= '<a href="'.url('/user/'. $user->user_id . '/edit').'" class="btn btn-warning btn-sm">Edit</a>';
+                $btn .= '<form class="d-inline-block" method="POST" action="'.url('/user/'. $user->user_id).'">' .
+                    csrf_field() . method_field('DELETE') .
+                    '<button type="submit" class="btn btn-danger btn-sm" onclick="return confirm(\'Apakah Anda yakin menghapus data ini?\');">Hapus</button></form>'; */
+            })
+            ->rawColumns(['aksi']) // Memberitahu bahwa kolom aksi berisi HTML
+            ->make(true);
     }
 
     // Menampilkan halaman form tambah user
