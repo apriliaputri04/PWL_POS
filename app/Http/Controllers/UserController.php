@@ -6,6 +6,7 @@ use App\Models\UserModel;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
@@ -229,5 +230,53 @@ class UserController extends Controller
         $level = LevelModel::select('level_id', 'level_nama')->get();
 
         return view('user.edit_ajax', ['user' => $user, 'level' => $level]);
+    }
+
+    public function update_ajax(Request $request, $id)
+    {
+        // Cek apakah request berasal dari AJAX
+        if ($request->ajax() || $request->wantsJson()) {
+            $rules = [
+                'level_id' => 'required|integer',
+                'username' => 'required|max:20|unique:m_user,username,' . $id . ',user_id',
+                'nama' => 'required|max:100',
+                'password' => 'nullable|min:6|max:20'
+            ];
+
+            // Validasi input
+            $validator = Validator::make($request->all(), $rules);
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => false, // false: gagal, true: berhasil
+                    'message' => 'Validasi gagal.',
+                    'msgField' => $validator->errors() // Menampilkan field yang error
+                ]);
+            }
+
+            // Cari data user berdasarkan ID
+            $user = UserModel::find($id);
+            if ($user) {
+                // Jika password tidak diisi, hapus dari request
+                if (!$request->filled('password')) {
+                    $request->request->remove('password');
+                }
+
+                // Update data user
+                $user->update($request->all());
+
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Data berhasil diperbarui'
+                ]);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Data tidak ditemukan'
+                ]);
+            }
+        }
+
+        // Redirect jika request bukan AJAX
+        return redirect('/');
     }
 }
