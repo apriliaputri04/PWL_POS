@@ -1,95 +1,110 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ config('app.name', 'PWL Laravel Starter Code') }}</title>
+@extends('layouts.template')
 
-    <meta name="csrf-token" content="{{ csrf_token()}}"> <!-- Untuk mengirimkan token Laravel CSRF pada setiap request ajax-->
+@section('content')
+    <div class="card card-outline card-primary">
+        <div class="card-header">
+            <h3 class="card-title">{{ $page->title }}</h3>
+            <div class="card-tools">
+                <a class="btn btn-sm btn-primary mt-1" href="{{ url('user/create') }}">Tambah</a>
+                <button onclick="modalAction('{{ url('user/create_ajax') }}')" class="btn btn-sm btn-success mt-1">Tambah Ajax</button>
+            </div>
+        </div>
+        <div class="card-body">
+            @if (session('success'))
+                <div class="alert alert-success">{{ session('success') }}</div>
+            @endif
+            @if (session('error'))
+                <div class="alert alert-danger">{{ session('error') }}</div>
+            @endif
+            <div class="row">
+                <label class="col-1 control-label col-form-label">Filter:</label>
+                <div class="col-3">
+                    <select class="form-control" id="level_id" name="level_id" required>
+                        <option value="">- Semua -</option>
+                        @foreach ($level as $item)
+                            <option value="{{ $item->level_id }}">{{ $item->level_nama }}</option>
+                        @endforeach
+                    </select>
+                    <small class="form-text text-muted">Level Pengguna</small>
+                </div>
+            </div>
+            <table class="table table-bordered table-striped table-hover table-sm" id="table_user">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>USERNAME</th>
+                        <th>NAMA</th>
+                        <th>LEVEL PENGGUNA</th>
+                        <th>AKSI</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+    <!-- Modal -->
+    <div id="myModal" class="modal fade animate shake" tabindex="-1" role="dialog" 
+        data-backdrop="static" data-keyboard="false" data-width="75%" aria-hidden="true"></div>
+@endsection
 
-    <!-- Google Font: Source Sans Pro -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="{{ asset('adminlte/plugins/fontawesome-free/css/all.min.css') }}">
-    <!-- DataTables -->
-    <link rel="stylesheet" href="{{ asset('adminlte/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('adminlte/plugins/datatables-responsive/css/responsive.bootstrap4.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('adminlte/plugins/datatables-buttons/css/buttons.bootstrap4.min.css') }}">
-    <!-- SweetAlert2 -->
-    <link rel="stylesheet" href="{{ asset('adminlte/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.css')}}">
-    <!-- Theme style -->
-    <link rel="stylesheet" href="{{ asset('adminlte/dist/css/adminlte.min.css') }}">
+@push('css')
+@endpush
 
-    @stack('css') <!-- Digunakan untuk memanggil custom css dari perintah push('css') pada masing-masing view-->
-</head>
-<body class="hold-transition sidebar-mini">
-<!-- Site wrapper -->
-<div class="wrapper">
-  <!-- Navbar -->
-  @include('layouts.header')
-  <!-- /.navbar -->
+@push('js')
+    <script>
+        function modalAction(url = ''){
+            $('#myModal').load(url, function(){
+                $('#myModal').modal('show');
+            });
+        }
 
-  <!-- Main Sidebar Container -->
-  <aside class="main-sidebar sidebar-dark-primary elevation-4">
-    <!-- Brand Logo -->
-    <a href="{{ url('/') }}" class="brand-link">
-      <img src="{{ asset('adminlte/dist/img/AdminLTELogo.png')}}" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-      <span class="brand-text font-weight-light">PWL - Starter Code</span>
-    </a>
+        var dataUser;
+        $(document).ready(function() {
+            dataUser = $('#table_user').DataTable({
+                serverSide: true,
+                ajax: {
+                    url: "{{ url('user/list') }}",
+                    dataType: 'json',
+                    type: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    data: function (d) {
+                        d.level_id = $('#level_id').val();
+                    }
+                },
+                columns: [
+                    { 
+                        data: "DT_RowIndex", 
+                        className: 'text-center', 
+                        orderable: false, 
+                        searchable: false 
+                    }, { 
+                        data: 'username', 
+                        className: "", 
+                        orderable: true, 
+                        searchable: true 
+                    }, { 
+                        data: 'nama', 
+                        className: "", 
+                        orderable: true, 
+                        searchable: true 
+                    }, { 
+                        data: 'level.level_nama', 
+                        className: "", 
+                        orderable: false, 
+                        searchable: false 
+                    }, { 
+                        data: 'aksi', 
+                        className: "text-center", 
+                        orderable: false, 
+                        searchable: false 
+                    }
+                ]
+            });
 
-    <!-- Sidebar -->
-    @include('layouts.sidebar')
-    <!-- /.sidebar -->
-  </aside>
-
-  <!-- Content Wrapper. Contains page content -->
-  <div class="content-wrapper">
-    <!-- Content Header (Page header) -->
-    @include('layouts.breadcrumb')
-
-    <!-- Main content -->
-    <section class="content">
-     @yield('content')
-    </section>
-    <!-- /.content -->
-  </div>
-  <!-- /.content-wrapper -->
-
-  @include("layouts.footer")
-</div>
-<!-- ./wrapper -->
-
-<!-- jQuery -->
-<script src="{{ asset('adminlte/plugins/jquery/jquery.min.js') }}"></script>
-<!-- Bootstrap 4 -->
-<script src="{{ asset('adminlte/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-<!-- DataTables & Plugins -->
-<script src="{{ asset('adminlte/plugins/datatables/jquery.dataTables.min.js') }}"></script>
-<script src="{{ asset('adminlte/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
-<script src="{{ asset('adminlte/plugins/datatables-responsive/js/dataTables.responsive.min.js') }}"></script>
-<script src="{{ asset('adminlte/plugins/datatables-responsive/js/responsive.bootstrap4.min.js') }}"></script>
-<script src="{{ asset('adminlte/plugins/datatables-buttons/js/dataTables.buttons.min.js') }}"></script>
-<script src="{{ asset('adminlte/plugins/datatables-buttons/js/buttons.bootstrap4.min.js') }}"></script>
-<script src="{{ asset('adminlte/plugins/jszip/jszip.min.js') }}"></script>
-<script src="{{ asset('adminlte/plugins/pdfmake/pdfmake.min.js') }}"></script>
-<script src="{{ asset('adminlte/plugins/pdfmake/vfs_fonts.js') }}"></script>
-<script src="{{ asset('adminlte/plugins/datatables-buttons/js/buttons.html5.min.js') }}"></script>
-<script src="{{ asset('adminlte/plugins/datatables-buttons/js/buttons.print.min.js') }}"></script>
-<script src="{{ asset('adminlte/plugins/datatables-buttons/js/buttons.colVis.min.js') }}"></script>
-
-<!-- jquery-validation -->
-<script src="{{ asset('adminlte/plugins/jquery-validation/jquery.validate.js')}}"></script>
-<script src="{{ asset('plugins/jquery-validation/additional-methods.min.js')}}"></script>
-
-<!-- SweetAlert2 -->
-<script src="{{ asset('adminlte/plugins/sweetalert2/sweetalert2.min.js')}}"></script>
-
-<!-- AdminLTE App -->
-<script src="{{ asset('adminlte/dist/js/adminlte.min.js') }}"></script>
-<script>
-    // Untuk mengirimkan token Laravel CSRF pada setiap request ajax
-    $.ajaxSetup({headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')}});
-  </script>
-  @stack('js') <!-- Digunakan untuk memanggil custom js dari perintah push('js') pada masing-masing view -->
-</body>
-</html>
+            $('#level_id').on('change', function () {
+                dataUser.ajax.reload();
+            });
+        });
+    </script>
+@endpush
