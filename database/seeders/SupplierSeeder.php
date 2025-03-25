@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class SupplierSeeder extends Seeder
 {
@@ -13,10 +14,27 @@ class SupplierSeeder extends Seeder
      */
     public function run(): void
     {
-       DB::table('m_supplier')->insert([
-            ['supplier_kode' => 'SUP001', 'supplier_nama' => 'PT. Sumber Jaya', 'created_at' => NOW()],
-            ['supplier_kode' => 'SUP002', 'supplier_nama' => 'CV. Makmur Sentosa', 'created_at' => NOW()],
-            ['supplier_kode' => 'SUP003', 'supplier_nama' => 'UD. Sukses Abadi',  'created_at' => NOW()],
-        ]);
+        $data_supplier = [
+            [
+                'supplier_kode' => 'SP001',
+                'supplier_nama' => 'PT Sumber Jaya Abadi',
+                'supplier_alamat' => 'Jl. Industri Raya No. 10, Jakarta Timur',
+                'created_at' => Carbon::now()
+            ],
+            [
+                'supplier_kode' => 'SP002',
+                'supplier_nama' => 'PT Mitra Sejahtera',
+                'supplier_alamat' => 'Jl. Pahlawan No. 25, Surabaya',
+                'created_at' => Carbon::now()
+            ],
+            [
+                'supplier_kode' => 'SP003',
+                'supplier_nama' => 'PT Sentosa Makmur Bersama',
+                'supplier_alamat' => 'Jl. Gatot Subroto No. 15, Bandung',
+                'created_at' => Carbon::now()
+            ],
+        ];
+
+        DB::table('m_supplier')->insert($data_supplier);
     }
 }
