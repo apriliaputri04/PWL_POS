@@ -7,6 +7,18 @@ use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\BarangController;
 use App\Http\Controllers\WelcomeController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
+
+Route::pattern('id', '[0-9]+'); // Pastilan parameter {id} hanya berupa angaka
+
+// Route otentikasi
+Route::get('login', [AuthController::class, 'login'])->name('login');
+Route::post('login', [AuthController::class, 'postlogin']);
+Route::get('logout', [AuthController::class, 'logout'])->middleware('auth');
+
+Route::middleware(['auth'])->group(function () { // artinya semua route di dalam group ini harus login dulu
+    // masukkan semua route yang perlu autentikasi di sini
+});
 
 /*
 |--------------------------------------------------------------------------
