@@ -17,11 +17,20 @@ Route::post('login', [AuthController::class, 'postlogin']);
 Route::post('logout', [AuthController::class, 'logout'])->middleware('auth');
 
 Route::middleware(['auth'])->group(function () { // artinya semua route di dalam group ini harus login dulu
-    // masukkan semua route yang perlu autentikasi di sini
-    Route::get('/', function () {
-        return view('welcome');
+    Route::get('/', [WelcomeController::class, 'index']);
+    //Route level
+
+    // artinya semua route di dalam gruop ini harus punya role ADM (Administrator)
+    Route::middleware(['authorize:ADM'])->group(function () {
+        Route::get('/level', [LevelController::class, 'index']);
+        Route::post('/level/list', [LevelController::class, 'list']); // untuk list json datatables
+        Route::get('/level/create', [LevelController::class, 'create']);
+        Route::post('/level', [LevelController::class, 'store']);
+        Route::get('/level/{id}/edit', [LevelController::class, 'edit']); // untuk tampilkan form edit
+        Route::put('/level/{id}', [LevelController::class, 'update']); // untuk proses update data
+        Route::delete('/level/{id}', [LevelController::class, 'destroy']); // untuk proses hapus data
     });
-    
+
     Route::get('/level', [LevelController::class, 'index']);
     Route::get('/kategori', [KategoriController::class, 'index']);
     Route::get('/user', [UserController::class, 'index']);
@@ -158,6 +167,10 @@ Route::middleware(['auth'])->group(function () { // artinya semua route di dalam
         Route::get('/{id}/delete_ajax', [BarangController::class, 'confirm_ajax']);
         Route::delete('/{id}/delete_ajax', [BarangController::class, 'delete_ajax']);
         Route::delete('/{id}', [BarangController::class, 'destroy']);
+    });
+
+    Route::get('/', function () {
+        return view('welcome');
     });
 });
 
