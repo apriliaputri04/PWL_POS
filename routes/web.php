@@ -17,6 +17,10 @@ Route::post('login', [AuthController::class, 'postlogin']);
 Route::post('logout', [AuthController::class, 'logout'])->middleware('auth');
 
 Route::middleware(['auth'])->group(function () { // artinya semua route di dalam group ini harus login dulu
+    Route::get('/', function () {
+        return view('welcome');
+    });
+    
     Route::get('/', [WelcomeController::class, 'index']);
     //Route level
 
@@ -169,9 +173,7 @@ Route::middleware(['auth'])->group(function () { // artinya semua route di dalam
         Route::delete('/{id}', [BarangController::class, 'destroy']);
     });
 
-    Route::get('/', function () {
-        return view('welcome');
-    });
+   
 });
 
 /*
