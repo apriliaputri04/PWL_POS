@@ -8,6 +8,8 @@ use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Border;
 
 class SupplierController extends Controller
 {
@@ -327,4 +329,65 @@ class SupplierController extends Controller
         return redirect('/');
     }
 
+    public function export_excel()
+    {
+        // Get supplier data to export
+        $suppliers = SupplierModel::select('supplier_id', 'supplier_kode', 'supplier_nama', 'supplier_alamat')
+                    ->orderBy('supplier_id')
+                    ->get();
+
+        // Create new Spreadsheet
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Set column headers
+        $sheet->setCellValue('A1', 'No');
+        $sheet->setCellValue('B1', 'Kode Supplier');
+        $sheet->setCellValue('C1', 'Nama Supplier');
+        $sheet->setCellValue('D1', 'Alamat Supplier');
+
+        // Format header bold
+        $sheet->getStyle('A1:D1')->getFont()->setBold(true);
+
+        // Fill data rows
+        $no = 1;
+        $row = 2;
+        foreach ($suppliers as $supplier) {
+            $sheet->setCellValue('A'.$row, $no);
+            $sheet->setCellValue('B'.$row, $supplier->supplier_kode);
+            $sheet->setCellValue('C'.$row, $supplier->supplier_nama);
+            $sheet->setCellValue('D'.$row, $supplier->supplier_alamat);
+            $row++;
+            $no++;
+        }
+
+        // Set auto size for columns
+        foreach (range('A', 'D') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        // Set borders for all data
+        $styleArray = [
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                ],
+            ],
+        ];
+        $sheet->getStyle('A1:D'.($row-1))->applyFromArray($styleArray);
+
+        // Set sheet title
+        $sheet->setTitle('Data Supplier');
+
+        // Generate filename
+        $filename = 'Data_Supplier_'.date('Y-m-d_H-i-s').'.xlsx';
+
+        // Save to temporary storage
+        $filePath = storage_path('app/public/'.$filename);
+        $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $writer->save($filePath);
+
+        // Download and delete after sending
+        return response()->download($filePath)->deleteFileAfterSend(true);
+    }
 }
