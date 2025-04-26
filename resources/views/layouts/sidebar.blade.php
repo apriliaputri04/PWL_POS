@@ -71,14 +71,20 @@
                 </a>
             </li>
 
-            <!-- Tombol Logout -->
+            <!-- Akun Section -->
             <li class="nav-header">Akun</li>
+            <li class="nav-item">
+                <a href="{{ route('profile.edit') }}" class="nav-link {{ ($activeMenu == 'profile') ? 'active' : '' }}">
+                    <i class="nav-icon fas fa-user-circle"></i>
+                    <p>Profile Setting</p>
+                </a>
+            </li>
             <li class="nav-item">
                 <a href="#" class="nav-link text-danger" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                     <i class="nav-icon fas fa-sign-out-alt"></i>
                     <p>Logout</p>
                 </a>
-                <form id="logout-form" action="{{ url('logout') }}" method="POST" style="display: none;">
+                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                     @csrf
                 </form>
             </li>
