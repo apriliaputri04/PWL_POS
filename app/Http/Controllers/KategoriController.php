@@ -6,9 +6,9 @@ use App\Models\KategoriModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\Facades\DataTables;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Illuminate\Support\Facades\Validator;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class KategoriController extends Controller
 {
@@ -373,27 +373,16 @@ public function export_excel()
 
 public function export_pdf()
 {
-    // Get kategori data ordered by kategori_kode
-    $kategori = KategoriModel::select('kategori_kode', 'kategori_nama')
-                ->orderBy('kategori_kode')
-                ->get();
+    $kategori = KategoriModel::select('kategori_id', 'kategori_kode', 'kategori_nama')
+        ->orderBy('kategori_id')
+        ->get();
 
-    // Load the PDF view
-    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('kategori.export_pdf', [
-        'kategori' => $kategori,
-        'title' => 'Data Kategori',
-        'date' => date('Y-m-d H:i:s')
-    ]);
+    // Load view untuk PDF
+    $pdf = Pdf::loadView('kategori.export_pdf', ['kategori' => $kategori]);
+    $pdf->setPaper('a4', 'portrait'); // Set ukuran kertas dan orientasi
+    $pdf->setOption("isRemoteEnabled", true); // Jika ada gambar dari URL
 
-    // Set paper options
-    $pdf->setPaper('a4', 'portrait');
-    $pdf->setOption("isRemoteEnabled", true);
-    
-    // Render the PDF
-    $pdf->render();
-
-    // Stream the PDF file for download
-    return $pdf->stream('Data Kategori '.date('Y-m-d H:i:s').'.pdf');
+    return $pdf->stream('Data_Kategori_' . date('Y-m-d_H-i-s') . '.pdf');
 }
 
 }
