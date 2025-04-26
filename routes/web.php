@@ -105,6 +105,7 @@ Route::middleware(['auth'])->group(function () {
             Route::post('import_ajax', [KategoriController::class, 'import_ajax']); // ajax import excel
              // Export Barang with Excel
              Route::get('export_excel', [KategoriController::class, 'export_excel']); //export excel
+             Route::get('export_pdf', [KategoriController::class, 'export_pdf']); //export pdf
         });
     });
 
@@ -142,7 +143,6 @@ Route::middleware(['auth'])->group(function () {
             Route::get('export_excel', [BarangController::class, 'export_excel']); //export excel
             // Export Barang with pdf
             Route::get('export_pdf', [BarangController::class, 'export_pdf']); //export pdf
-
         });
     });
 
