@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
 
 class UserController extends Controller
 {
@@ -408,5 +409,70 @@ class UserController extends Controller
             ]);
         }
         return redirect('/');
+    }
+
+    public function export_excel()
+    {
+        // Ambil data user yang akan diekspor dengan relasi level
+        $users = UserModel::with('level')
+                ->select('user_id', 'username', 'nama', 'level_id')
+                ->orderBy('user_id')
+                ->get();
+
+        // Load library PhpSpreadsheet
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Set header kolom
+        $sheet->setCellValue('A1', 'No');
+        $sheet->setCellValue('B1', 'ID Pengguna');
+        $sheet->setCellValue('C1', 'Username');
+        $sheet->setCellValue('D1', 'Nama');
+        $sheet->setCellValue('E1', 'Level');
+
+        // Format header bold
+        $sheet->getStyle('A1:E1')->getFont()->setBold(true);
+
+        // Isi data user
+        $no = 1;
+        $baris = 2;
+        foreach ($users as $user) {
+            $sheet->setCellValue('A' . $baris, $no);
+            $sheet->setCellValue('B' . $baris, $user->user_id);
+            $sheet->setCellValue('C' . $baris, $user->username);
+            $sheet->setCellValue('D' . $baris, $user->nama);
+            $sheet->setCellValue('E' . $baris, $user->level->level_nama ?? '');
+            $baris++;
+            $no++;
+        }
+
+        // Set auto size untuk kolom
+        foreach (range('A', 'E') as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        }
+
+        // Set border untuk seluruh data
+        $styleArray = [
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                ],
+            ],
+        ];
+        $sheet->getStyle('A1:E'.($baris-1))->applyFromArray($styleArray);
+
+        // Set title sheet
+        $sheet->setTitle('Data User');
+        
+        // Generate filename dengan format yang konsisten
+        $filename = 'Data_User_' . date('Y-m-d_H-i-s') . '.xlsx';
+
+        // Simpan ke storage sementara
+        $filePath = storage_path('app/public/' . $filename);
+        $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $writer->save($filePath);
+
+        // Download file dan hapus setelah selesai
+        return response()->download($filePath)->deleteFileAfterSend(true);
     }
 }
