@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class UserController extends Controller
 {
@@ -474,5 +475,31 @@ class UserController extends Controller
 
         // Download file dan hapus setelah selesai
         return response()->download($filePath)->deleteFileAfterSend(true);
+    }
+
+    public function export_pdf()
+    {
+        // Get user data with level relationship
+        $users = UserModel::with('level')
+                ->select('user_id', 'username', 'nama', 'level_id')
+                ->orderBy('user_id')
+                ->get();
+
+        // Load the PDF view
+        $pdf = Pdf::loadView('user.export_pdf', [
+            'users' => $users,
+            'title' => 'Data User',
+            'date' => date('Y-m-d H:i:s')
+        ]);
+
+        // Set paper options
+        $pdf->setPaper('a4', 'portrait');
+        $pdf->setOption("isRemoteEnabled", true);
+        
+        // Render the PDF
+        $pdf->render();
+
+        // Stream the PDF file for download
+        return $pdf->stream('Data User '.date('Y-m-d H:i:s').'.pdf');
     }
 }
