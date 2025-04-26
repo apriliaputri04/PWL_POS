@@ -8,7 +8,6 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-
             <div class="modal-body">
                 <div class="form-group">
                     <label>Download Template</label>
@@ -17,14 +16,12 @@
                     </a>
                     <small id="error-kategori_id" class="error-text form-text text-danger"></small>
                 </div>
-
                 <div class="form-group">
                     <label>Pilih File</label>
                     <input type="file" name="file_barang" id="file_barang" class="form-control" required>
                     <small id="error-file_barang" class="error-text form-text text-danger"></small>
                 </div>
             </div>
-
             <div class="modal-footer">
                 <button type="button" data-dismiss="modal" class="btn btn-warning">Batal</button>
                 <button type="submit" class="btn btn-primary">Upload</button>
@@ -40,19 +37,19 @@ $(document).ready(function() {
             file_barang: {
                 required: true,
                 extension: "xlsx"
-            }
+            },
         },
         submitHandler: function(form) {
-            var formData = new FormData(form); // Membuat FormData untuk meng-handle file upload
-
+            var formData = new FormData(form); // Jadikan form ke FormData untuk menghandle file
+            
             $.ajax({
                 url: form.action,
                 type: form.method,
-                data: formData,
-                processData: false, // agar data FormData tidak diproses menjadi query string
-                contentType: false, // agar konten tetap dalam bentuk multipart/form-data
+                data: formData, // Data yang dikirim berupa FormData
+                processData: false, // setting processData dan contentType ke false, untuk menghandle file
+                contentType: false,
                 success: function(response) {
-                    if (response.status) {
+                    if(response.status) { // jika sukses
                         $('#myModal').modal('hide');
                         Swal.fire({
                             icon: 'success',
@@ -60,10 +57,10 @@ $(document).ready(function() {
                             text: response.message
                         });
                         tableBarang.ajax.reload(); // reload datatable
-                    } else {
-                        $('.error-text').text(''); // clear semua error-text
+                    } else { // jika error
+                        $('.error-text').text('');
                         $.each(response.msgField, function(prefix, val) {
-                            $('#error-' + prefix).text(val[0]);
+                            $('#error-'+prefix).text(val[0]);
                         });
                         Swal.fire({
                             icon: 'error',
@@ -80,10 +77,10 @@ $(document).ready(function() {
             error.addClass('invalid-feedback');
             element.closest('.form-group').append(error);
         },
-        highlight: function(element) {
+        highlight: function(element, errorClass, validClass) {
             $(element).addClass('is-invalid');
         },
-        unhighlight: function(element) {
+        unhighlight: function(element, errorClass, validClass) {
             $(element).removeClass('is-invalid');
         }
     });
