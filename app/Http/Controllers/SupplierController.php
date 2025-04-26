@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Log;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Border;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class SupplierController extends Controller
 {
@@ -389,5 +390,20 @@ class SupplierController extends Controller
 
         // Download and delete after sending
         return response()->download($filePath)->deleteFileAfterSend(true);
+    }
+
+    public function export_pdf()
+    {
+        // Get supplier data to export
+        $suppliers = SupplierModel::select('supplier_id', 'supplier_kode', 'supplier_nama', 'supplier_alamat')
+                    ->orderBy('supplier_id')
+                    ->get();
+
+        // Load view for PDF
+        $pdf = Pdf::loadView('supplier.export_pdf', ['suppliers' => $suppliers]);
+        $pdf->setPaper('a4', 'portrait'); // Set paper size and orientation
+        $pdf->setOption("isRemoteEnabled", true); // Enable if there are remote images
+
+        return $pdf->stream('Data_Supplier_' . date('Y-m-d_H-i-s') . '.pdf');
     }
 }
