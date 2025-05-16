@@ -2,12 +2,14 @@
 
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\BarangController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\LevelController;
 use App\Http\Controllers\WelcomeController;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\ProfileController;
+use App\Models\SupplierModel;
+use App\Http\Controllers\TransaksiPenjualanController;
 use Illuminate\Support\Facades\Route;
 
 Route::pattern('id', '[0-9]+'); // Pastikan parameter {id} hanya berupa angka
@@ -22,6 +24,8 @@ Route::post('/register', [AuthController::class, 'postRegister']);
 
 Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
 Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+
+Route::get('/transaksi-penjualan', [TransaksiPenjualanController::class, 'index'])->name('transaksi-penjualan.index');
 
 // Semua rute di bawah ini hanya bisa diakses jika sudah login
 Route::middleware(['auth'])->group(function () {
@@ -83,7 +87,6 @@ Route::middleware(['auth'])->group(function () {
             Route::get('export_excel', [LevelController::class, 'export_excel']); //export excel
             // Export Level with pdf
             Route::get('export_pdf', [LevelController::class, 'export_pdf']); //export pdf
-            
         });
     });
 
@@ -110,9 +113,10 @@ Route::middleware(['auth'])->group(function () {
             // Import Kategori with Excel
             Route::get('import', [KategoriController::class, 'import']); // ajax form upload excel
             Route::post('import_ajax', [KategoriController::class, 'import_ajax']); // ajax import excel
-             // Export Barang with Excel
-             Route::get('export_excel', [KategoriController::class, 'export_excel']); //export excel
-             Route::get('export_pdf', [KategoriController::class, 'export_pdf']); //export pdf
+            // Export Kategori with Excel
+            Route::get('export_excel', [KategoriController::class, 'export_excel']); //export excel
+            // Export Kategori with pdf
+            Route::get('export_pdf', [KategoriController::class, 'export_pdf']); //export pdf
         });
     });
 
@@ -150,6 +154,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('export_excel', [BarangController::class, 'export_excel']); //export excel
             // Export Barang with pdf
             Route::get('export_pdf', [BarangController::class, 'export_pdf']); //export pdf
+
         });
     });
 
@@ -167,20 +172,20 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/{id}', [SupplierController::class, 'show']);
             Route::get('/{id}/edit', [SupplierController::class, 'edit']);
             Route::put('/{id}', [SupplierController::class, 'update']);
-             // Edit menggunakan AJAX
-             Route::get('/{id}/edit_ajax', [SupplierController::class, 'edit_ajax']); // menampilkan halaman form edit Supplier ajax
-             Route::put('/{id}/update_ajax', [SupplierController::class, 'update_ajax']); // menyimpan perubahan data Supplier ajax
-             // Delete menggunakan AJAX
-             Route::get('/{id}/delete_ajax', [SupplierController::class, 'confirm_ajax']); //menampilkan form confirm delete Supplier ajax
-             Route::delete('/{id}/delete_ajax', [SupplierController::class, 'delete_ajax']); // menghapus data Supplier ajax
+            // Edit menggunakan AJAX
+            Route::get('/{id}/edit_ajax', [SupplierController::class, 'edit_ajax']); // menampilkan halaman form edit Supplier ajax
+            Route::put('/{id}/update_ajax', [SupplierController::class, 'update_ajax']); // menyimpan perubahan data Supplier ajax
+            // Delete menggunakan AJAX
+            Route::get('/{id}/delete_ajax', [SupplierController::class, 'confirm_ajax']); //menampilkan form confirm delete Supplier ajax
+            Route::delete('/{id}/delete_ajax', [SupplierController::class, 'delete_ajax']); // menghapus data Supplier ajax
             Route::delete('/{id}', [SupplierController::class, 'destroy']);
             // Import Supplier with Excel
             Route::get('import', [SupplierController::class, 'import']); // ajax form upload excel
             Route::post('import_ajax', [SupplierController::class, 'import_ajax']); // ajax import excel
             // Export User with Excel
             Route::get('export_excel', [SupplierController::class, 'export_excel']); //export excel
-             // Export Supplier with pdf
-             Route::get('export_pdf', [SupplierController::class, 'export_pdf']); //export pdf
+            // Export Supplier with pdf
+            Route::get('export_pdf', [SupplierController::class, 'export_pdf']); //export pdf
         });
     });
 });
