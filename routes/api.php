@@ -19,7 +19,7 @@ use App\Http\Controllers\Api\UserController;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
-
+Route::post('/register1', App\Http\Controllers\Api\RegisterController::class)->name('register1');
 Route::post('/register', [RegisterController::class, '__invoke'])->name('register');
 Route::post('/register', [App\Http\Controllers\Api\RegisterController::class, '__invoke'])->name('register');
 Route::post('/login', [App\Http\Controllers\Api\LoginController::class, '__invoke'])->name('login');
